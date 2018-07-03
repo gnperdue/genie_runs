@@ -42,6 +42,7 @@ Usage: ./do_a_run.sh    -<f>|--<flag> arg
                         -e / --energy NUM(RNG) : e or emin,emax (default 1 GeV)
                         -u / --nus NU          : neutrino flavor (default 14)
                         -s / --seed #          : random number seed (default 2989819)
+                        -p / --spline FILE     : override auto spline loading
                         -f / --func            : flux shape (required for energy range,
                                                  default to 1/x)
                         --tune                 : tune
@@ -118,6 +119,10 @@ do
             NEUTRINOS="$1"
             shift
             ;;        
+        -p|--spline)
+            SPLINE="$1"
+            shift
+            ;;        
         -s|--seed)
             SEED="$1"
             shift
@@ -150,8 +155,8 @@ fi
 
 if [[ $LIST == "Default" ]]; then
     # Look locally first to override defaults.
-    if [[ -e gxspl-NuMIsmall.xml ]]; then
-        SPLINEFILE=gxspl-NuMIsmall.xml
+    if [[ -e $SPLINE ]]; then
+        SPLINEFILE=$SPLINE
     fi
 else
     if [[ $LIST == "CCQE" || 
@@ -173,13 +178,18 @@ else
         echo "Error! This script doesn't know how to handle the LIST."
         exit 1
     fi
-    # Check the XSECSPLINEDIR for the targetted splines...
-    if [[ -e $XSECSPLINEDIR/$FILENAM ]]; then
-        SPLINEFILE=$XSECSPLINEDIR/$FILENAM
-    fi
-    # ...but prefer local splines if they exist.
-    if [[ -e $FILENAM ]]; then
-        SPLINEFILE=$FILENAM
+    # First check the override if provided
+    if [[ -e $SPLINE ]]; then
+        SPLINEFILE=$SPLINE
+    else
+        # Check the XSECSPLINEDIR for the targetted splines...
+        if [[ -e $XSECSPLINEDIR/$FILENAM ]]; then
+            SPLINEFILE=$XSECSPLINEDIR/$FILENAM
+        fi
+        # ...but prefer local splines if they exist.
+        if [[ -e $FILENAM ]]; then
+            SPLINEFILE=$FILENAM
+        fi
     fi
 fi   
          
