@@ -31,7 +31,7 @@ end
 break EventGenerator.cxx:118 if ffwd==false
 
 # 4 top of the event loop
-break gEvGen.cxx:303
+break gEvGen.cxx:310
 commands 4
 printf "The event number is %d\n", ievent
 end
